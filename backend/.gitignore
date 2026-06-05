@@ -1,0 +1,15 @@
+# Virtual Environment
+env/
+venv/
+ENV/
+
+# Next.js build output
+.next/
+out/
+
+# Node modules
+node_modules/
+
+# Production env files
+.env.local
+.env.production
