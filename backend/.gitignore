@@ -10,6 +10,8 @@ out/
 # Node modules
 node_modules/
 
-# Production env files
+# Environment files (semua .env kecuali .env.example)
+.env
 .env.local
 .env.production
+*.env
