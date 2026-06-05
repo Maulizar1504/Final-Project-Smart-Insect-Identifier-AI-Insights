@@ -62,8 +62,6 @@ async def predict(file: UploadFile = File(...)):
 
     allowed = {"image/jpeg", "image/jpg", "image/png", "image/webp", "image/bmp"}
 
-    # Hanya tolak kalau content_type ada tapi bukan gambar
-    # (file tanpa ekstensi content_type-nya None → tetap diproses)
     if file.content_type and file.content_type not in allowed:
         raise HTTPException(400, f"Harus berupa gambar, bukan {file.content_type}")
 
@@ -79,8 +77,11 @@ async def predict(file: UploadFile = File(...)):
 
     # ── Gemini Insights ───────────────────────────────────────────────────────
     try:
+        print(f"🔍 Memanggil Gemini untuk: {prediction['class_name']}")
         insights = await gemini_svc.get_insights(prediction["class_name"], data)
+        print(f"✅ Gemini berhasil — panjang respons: {len(insights.get('content', ''))} karakter")
     except Exception as exc:
+        print(f"❌ GEMINI ERROR: {type(exc).__name__}: {exc}")
         name = prediction["class_name"]
         conf = prediction["confidence"]
         insights = {

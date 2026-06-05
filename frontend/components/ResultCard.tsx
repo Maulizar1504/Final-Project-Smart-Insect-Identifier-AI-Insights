@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import type { Components } from 'react-markdown';
 
 interface Prediction {
   class: string;
@@ -33,6 +34,90 @@ export default function ResultCard({ result }: ResultProps) {
     Sedang: { color: '#d4921a', bg: 'rgba(212,146,26,0.10)', border: 'rgba(212,146,26,0.25)' },
     Rendah: { color: '#e05a4a', bg: 'rgba(224,90,74,0.10)',  border: 'rgba(224,90,74,0.25)'  },
   }[confLevel];
+
+  // Custom markdown components dengan styling manual
+  const markdownComponents: Components = {
+    h2: ({ children }) => (
+      <h2 style={{
+        fontSize: '0.95rem',
+        fontWeight: 700,
+        color: 'var(--amber-light)',
+        marginTop: '1.4rem',
+        marginBottom: '0.5rem',
+        paddingBottom: '0.3rem',
+        borderBottom: '1px solid var(--border)',
+        letterSpacing: '0.01em',
+      }}>
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 style={{
+        fontSize: '0.85rem',
+        fontWeight: 600,
+        color: 'var(--text)',
+        marginTop: '1rem',
+        marginBottom: '0.35rem',
+      }}>
+        {children}
+      </h3>
+    ),
+    p: ({ children }) => (
+      <p style={{
+        fontSize: '0.875rem',
+        lineHeight: '1.75',
+        color: 'var(--text-muted)',
+        marginBottom: '0.5rem',
+      }}>
+        {children}
+      </p>
+    ),
+    strong: ({ children }) => (
+      <strong style={{
+        fontWeight: 600,
+        color: 'var(--text)',
+      }}>
+        {children}
+      </strong>
+    ),
+    ul: ({ children }) => (
+      <ul style={{
+        paddingLeft: '1.25rem',
+        marginBottom: '0.5rem',
+        listStyleType: 'disc',
+      }}>
+        {children}
+      </ul>
+    ),
+    li: ({ children }) => (
+      <li style={{
+        fontSize: '0.875rem',
+        lineHeight: '1.7',
+        color: 'var(--text-muted)',
+        marginBottom: '0.25rem',
+      }}>
+        {children}
+      </li>
+    ),
+    hr: () => (
+      <hr style={{
+        border: 'none',
+        borderTop: '1px solid var(--border)',
+        margin: '1rem 0',
+        opacity: 0.5,
+      }} />
+    ),
+    em: ({ children }) => (
+      <em style={{
+        color: 'var(--text-muted)',
+        opacity: 0.65,
+        fontSize: '0.8rem',
+        fontStyle: 'italic',
+      }}>
+        {children}
+      </em>
+    ),
+  };
 
   return (
     <div
@@ -136,7 +221,7 @@ export default function ResultCard({ result }: ResultProps) {
 
       {/* ── AI Insight ──────────────────────── */}
       <div>
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-5">
           <div
             className="w-5 h-5 rounded flex items-center justify-center"
             style={{ background: 'var(--amber-dim)', border: '1px solid var(--border)' }}
@@ -158,14 +243,17 @@ export default function ResultCard({ result }: ResultProps) {
           </h3>
         </div>
 
-        <div
-          className="prose prose-invert prose-sm max-w-none leading-relaxed"
-          style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-dm-sans, system-ui)' }}
-        >
-          <ReactMarkdown>
-            {result.ai_insight ?? ''}
-          </ReactMarkdown>
-        </div>
+        {result.ai_insight ? (
+          <div style={{ paddingLeft: '0.25rem' }}>
+            <ReactMarkdown components={markdownComponents}>
+              {result.ai_insight}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            Informasi detail AI sementara tidak tersedia. Silakan coba lagi nanti.
+          </p>
+        )}
       </div>
 
     </div>

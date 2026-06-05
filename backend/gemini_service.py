@@ -9,7 +9,7 @@ load_dotenv()
 
 
 class GeminiService:
-    """Integrasi Google Gemini 2.0 Flash Lite untuk AI insights serangga."""
+    """Integrasi Google Gemini-3.5 Flash untuk AI insights serangga."""
 
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
@@ -24,18 +24,20 @@ class GeminiService:
             import google.generativeai as genai
             genai.configure(api_key=self.api_key)
             self.model = genai.GenerativeModel(
-                model_name        = "gemini-2.0-flash-lite",
+                model_name = "gemini-3.5-flash",
                 generation_config = genai.GenerationConfig(
                     temperature       = 0.7,
                     top_p             = 0.85,
                     top_k             = 40,
-                    max_output_tokens = 1200,
+                    max_output_tokens = 8192,
                 ),
                 system_instruction = (
-                    "Anda adalah ahli entomologi (ilmuwan serangga) berpengalaman. "
-                    "Berikan informasi akurat, menarik, dan mudah dipahami "
-                    "tentang serangga dalam Bahasa Indonesia. "
-                    "Format respons selalu dalam Markdown yang rapi."
+                    "Kamu adalah ahli entomologi senior yang sangat berpengalaman. "
+                    "Tugasmu adalah memberikan informasi LENGKAP, DETAIL, dan AKURAT "
+                    "tentang serangga dalam Bahasa Indonesia yang mudah dipahami. "
+                    "Selalu jawab SEMUA bagian yang diminta tanpa terkecuali. "
+                    "Jangan pernah mempersingkat atau melewati bagian apapun. "
+                    "Format respons selalu dalam Markdown yang rapi dan terstruktur."
                 ),
             )
             print("Gemini model berhasil diinisialisasi")
@@ -45,39 +47,40 @@ class GeminiService:
             print(f"WARNING: Gagal init Gemini — {exc}")
 
     def _build_prompt(self, name: str) -> str:
-        lines = [
-            f"Berikan informasi lengkap dan menarik tentang serangga berikut:",
-            "",
-            f"**Serangga:** {name}",
-            "",
-            "Gunakan format berikut PERSIS (termasuk emoji dan heading Markdown):",
-            "",
-            "## Identifikasi Ilmiah",
-            "**Nama Ilmiah:** [nama ilmiah]  ",
-            "**Kingdom:** Animalia | **Phylum:** Arthropoda | **Class:** Insecta  ",
-            "**Ordo:** [ordo] | **Famili:** [famili] | **Genus:** [genus]",
-            "",
-            "## Distribusi & Habitat",
-            "[Deskripsi 2-3 kalimat tentang sebaran geografis dan habitat alami]",
-            "",
-            "## Morfologi & Ciri Khas",
-            "[Deskripsi 2-3 kalimat tentang penampilan fisik yang membedakan]",
-            "",
-            "## Perilaku & Ekologi",
-            "[Deskripsi 2-3 kalimat tentang perilaku, makanan, dan peran ekologis]",
-            "",
-            "## Dampak & Kepentingan",
-            "[Dampak terhadap manusia/pertanian/ekosistem — positif maupun negatif]",
-            "",
-            "## Fun Facts",
-            "- [Fakta menarik 1]",
-            "- [Fakta menarik 2]",
-            "- [Fakta menarik 3]",
-            "",
-            "---",
-            "*Informasi disediakan oleh Smart Insect Identifier AI*",
-        ]
-        return "\n".join(lines)
+        return f"""Kamu adalah ahli entomologi senior. Berikan informasi LENGKAP dan DETAIL tentang serangga berikut dalam Bahasa Indonesia.
+
+Serangga: {name}
+
+Tulis dengan format PERSIS seperti ini (jangan skip satu bagian pun, isi setiap bagian dengan lengkap):
+
+## Identifikasi Ilmiah
+**Nama Ilmiah:** [nama ilmiah lengkap dalam huruf miring]
+**Nama Umum:** [nama umum dalam bahasa Indonesia]
+**Kingdom:** Animalia | **Phylum:** Arthropoda | **Class:** Insecta
+**Ordo:** [ordo] | **Famili:** [famili] | **Genus:** [genus]
+
+## Distribusi & Habitat
+[Tulis 3-4 kalimat LENGKAP tentang di mana serangga ini ditemukan di dunia, negara atau benua mana saja, jenis habitat yang disukai seperti hutan, ladang, kebun, rumah, atau area lainnya, serta kondisi iklim yang cocok untuk hidupnya]
+
+## Morfologi & Ciri Khas
+[Tulis 3-4 kalimat LENGKAP tentang ukuran tubuh dalam milimeter atau sentimeter, warna dan pola tubuh yang khas, bentuk sayap jika ada, antena, kaki, dan ciri fisik unik yang membedakannya dari spesies lain yang mirip]
+
+## Perilaku & Ekologi
+[Tulis 3-4 kalimat LENGKAP tentang pola makan dan makanan favoritnya, siklus hidup dari telur hingga dewasa, perilaku sosial apakah soliter atau berkelompok, musim aktif, dan interaksi dengan makhluk hidup lain di sekitarnya]
+
+## Dampak & Kepentingan
+[Tulis 3-4 kalimat LENGKAP tentang manfaat positif atau kerugian yang ditimbulkan bagi manusia, perannya dalam pertanian baik sebagai hama maupun pembantu, kontribusinya pada ekosistem seperti penyerbukan atau dekomposisi, dan nilai ekonomisnya jika ada]
+
+## Fun Facts 🦋
+- [Fakta unik dan mengejutkan tentang serangga ini yang jarang diketahui orang]
+- [Fakta menarik kedua tentang kemampuan atau perilaku khususnya]
+- [Fakta ketiga yang berhubungan dengan rekor atau keunikan biologisnya]
+- [Fakta keempat tentang hubungannya dengan manusia atau budaya]
+
+---
+*Informasi disediakan oleh LensArthropoda AI*
+
+PENTING: Isi SEMUA bagian di atas secara lengkap dan detail. Jangan disingkat. Total minimal 400 kata."""
 
     async def get_insights(
         self,
